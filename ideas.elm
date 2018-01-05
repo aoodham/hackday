@@ -21,7 +21,11 @@ type alias Model =
   }
 
 model : Model
-model = Model
+model = emptyModel
+
+
+emptyModel : Model
+emptyModel = Model
   (Idea "" "" "" "")
   []
 
@@ -44,9 +48,7 @@ update msg {new, saved} =
         (saved ++ [new])
 
     Reset ->
-      Model
-        (Idea "" "" "" "")
-        []
+      emptyModel
 
     UpdateTitle title ->
       Model
@@ -82,7 +84,12 @@ view model =
 
 makeDiv: Idea -> Html Msg
 makeDiv idea =
-  div [style [("color", "green")]] [text (idea.title ++ " " ++ idea.description ++ " " ++ idea.person ++ " " ++ idea.status)]
+  div [style cardStyle]
+  [ div [style titleStyle] [text (idea.title)]
+  , div [] [text (idea.description)]
+  , div [] [text (idea.person)]
+  , div [] [text (idea.status)]
+  ]
 
 viewNewIdea : Idea -> Html Msg
 viewNewIdea idea =
@@ -92,3 +99,22 @@ viewNewIdea idea =
     , input [ placeholder "Person who proposed the idea", value idea.person, onInput UpdatePerson ] [ text idea.person ]
     , input [ placeholder "New", value idea.status, onInput UpdateStatus ] [ text idea.status ]
     ]
+
+cardStyle : List (String, String)
+cardStyle =
+  [ ("display" , "flex")
+  , ("flex", "1")
+  , ("flexDirection", "row")
+  , ("justifyContent", "space-between")
+  , ("alignItems", "center")
+  , ("margin", "100px")
+  , ("border", "1px solid")
+  ]
+
+titleStyle: List (String, String)
+titleStyle =
+  [ ("fontSize", "30px")
+  , ("fontWeight", "bold")
+  , ("margin", "2px")
+  , ("border", "1px dotted")
+  ]
