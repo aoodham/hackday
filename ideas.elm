@@ -21,13 +21,21 @@ type alias Model =
   }
 
 model : Model
-model = emptyModel
+model = initialModel
 
 
 emptyModel : Model
 emptyModel = Model
   (Idea "" "" "" "")
   []
+
+
+initialModel : Model
+initialModel = Model
+  (Idea "" "" "" "")
+  [ Idea "Idea title" "This is a description of the idea" "Douglas" "Nope"
+  , Idea "Hackday ideas board" "Whose idea was this, it's great" "Who" "YEAH"
+  ]
 
 
 -- UPDATE
@@ -75,9 +83,8 @@ update msg {new, saved} =
 
 view : Model -> Html Msg
 view model =
-  div []
+  div [style containerStyle]
     [ viewNewIdea model.new
-    , button [ onClick Add ] [ text "+" ]
     , div [] (List.map makeDiv model.saved)
     , button [ onClick Reset ] [ text "reset" ]
     ]
@@ -98,16 +105,25 @@ viewNewIdea idea =
     , input [ placeholder "Description", value idea.description, onInput UpdateDescription ] [ text idea.description ]
     , input [ placeholder "Person who proposed the idea", value idea.person, onInput UpdatePerson ] [ text idea.person ]
     , input [ placeholder "New", value idea.status, onInput UpdateStatus ] [ text idea.status ]
+    , button [ onClick Add ] [ text "Submit" ]
     ]
+
+containerStyle : List (String, String)
+containerStyle =
+  [ ("display", "flex")
+  , ("flex", "1")
+  , ("flexDirection", "column")
+  , ("justifyContent", "center")
+  , ("alignItems", "center")
+  ]
 
 cardStyle : List (String, String)
 cardStyle =
-  [ ("display" , "flex")
-  , ("flex", "1")
-  , ("flexDirection", "row")
+  [ ("flexDirection", "row")
   , ("justifyContent", "space-between")
   , ("alignItems", "center")
-  , ("margin", "100px")
+  , ("padding", "10px")
+  , ("margin", "5px")
   , ("border", "1px solid")
   ]
 
