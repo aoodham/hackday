@@ -82,14 +82,13 @@ view model =
 
 makeDiv: Idea -> Html Msg
 makeDiv idea =
-  div [] [text (idea.title ++ " " ++ idea.description ++ " " ++ idea.person ++ " " ++ idea.status)]
+  div [style [("color", "green")]] [text (idea.title ++ " " ++ idea.description ++ " " ++ idea.person ++ " " ++ idea.status)]
 
 viewNewIdea : Idea -> Html Msg
 viewNewIdea idea =
    div []
-    [ input [ type_ "text", placeholder "Title", onInput UpdateTitle ] [text idea.title]
-    , input [ type_ "descr", placeholder "Description", onInput UpdateDescription ] [text idea.description]
-    , input [ type_ "person", placeholder "Person who proposed the idea", onInput UpdatePerson ] [text idea.person]
-    , input [ type_ "satus", placeholder "New", onInput UpdateStatus ] [text idea.status]
-    --, button [ onClick AddNew  ] [ text "Save" ]
+    [ input [ placeholder "Title", value idea.title, onInput UpdateTitle ] [ text idea.title ]
+    , input [ placeholder "Description", value idea.description, onInput UpdateDescription ] [ text idea.description ]
+    , input [ placeholder "Person who proposed the idea", value idea.person, onInput UpdatePerson ] [ text idea.person ]
+    , input [ placeholder "New", value idea.status, onInput UpdateStatus ] [ text idea.status ]
     ]
