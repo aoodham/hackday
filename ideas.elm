@@ -9,10 +9,12 @@ main =
 -- MODEL
 
 type alias Idea =
-  { title : String
+  { id : Int
+  , title : String
   , description: String
   , person: String
   , status: String
+  , votes: Int
   }
 
 type alias Model =
@@ -20,23 +22,36 @@ type alias Model =
   , saved: List Idea
   }
 
+emptyNewIdea n =
+    Idea (getNewId n) "" "" "" "" 0
+
 model : Model
 model = initialModel
 
 
 emptyModel : Model
 emptyModel = Model
-  (Idea "" "" "" "")
+  (emptyNewIdea -1)
   []
-
 
 initialModel : Model
 initialModel = Model
-  (Idea "" "" "" "")
-  [ Idea "Idea title" "This is a description of the idea" "Douglas" "Nope"
-  , Idea "Hackday ideas board" "Whose idea was this, it's great" "Who" "YEAH"
+  (Idea 2 "" "" "" "" 0)
+  [ Idea 0 "Idea title" "This is a description of the idea" "Douglas" "Nope" 0
+  , Idea 1 "Hackday ideas board" "Whose idea was this, it's great" "Who" "YEAH" 100
   ]
 
+-- Helpers
+
+getNewId: Int -> Int
+getNewId n = if n < 0 then 0 else n + 1
+
+onVote: Int  -> Int -> Idea -> List Idea -> List Idea
+onVote id vote new ideas =
+      if new.id == id then
+        {new | votes = new.votes + vote}::ideas
+      else
+        new::ideas
 
 -- UPDATE
 
@@ -46,13 +61,14 @@ type Msg = Add
           | UpdateDescription String
           | UpdateStatus String
           | UpdatePerson String
+          | Vote Int Int
 
 update : Msg -> Model -> Model
 update msg {new, saved} =
   case msg of
     Add ->
       Model
-        (Idea "" "" "" "")
+        (emptyNewIdea new.id)
         (saved ++ [new])
 
     Reset ->
@@ -60,24 +76,28 @@ update msg {new, saved} =
 
     UpdateTitle title ->
       Model
-        {new | title = title}
+        { new | title = title }
         saved
 
     UpdateDescription description ->
       Model
-        { new | description = description}
+        { new | description = description }
         saved
 
     UpdatePerson person ->
       Model
-        { new | person = person}
+        { new | person = person }
         saved
 
     UpdateStatus status ->
       Model
-        { new | status = status}
+        { new | status = status }
         saved
 
+    Vote id v->
+      Model
+        new
+        (List.foldr (onVote id v) [] saved)
 
 -- VIEW
 
@@ -92,10 +112,13 @@ view model =
 makeDiv: Idea -> Html Msg
 makeDiv idea =
   div [style cardStyle]
-  [ div [style titleStyle] [text (idea.title)]
+  [ div [style titleStyle] [text (toString idea.id ++ " " ++ idea.title)]
   , div [] [text (idea.description)]
   , div [] [text (idea.person)]
   , div [] [text (idea.status)]
+  , div [] [text (toString idea.votes)]
+  , button [ onClick (Vote idea.id 1) ] [ text "Upvote" ]
+  , button [ onClick (Vote idea.id -1) ] [ text "Downvote" ]
   ]
 
 viewNewIdea : Idea -> Html Msg
