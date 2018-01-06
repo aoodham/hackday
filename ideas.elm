@@ -13,7 +13,6 @@ type alias Idea =
   , title : String
   , description: String
   , person: String
-  , status: String
   , votes: Int
   }
 
@@ -23,7 +22,7 @@ type alias Model =
   }
 
 emptyNewIdea n =
-    Idea (getNewId n) "" "" "" "" 0
+    Idea (getNewId n) "" "" "" 0
 
 model : Model
 model = initialModel
@@ -36,9 +35,9 @@ emptyModel = Model
 
 initialModel : Model
 initialModel = Model
-  (Idea 2 "" "" "" "" 0)
-  [ Idea 0 "Idea title" "This is a description of the idea" "Douglas" "Nope" 0
-  , Idea 1 "Hackday ideas board" "Whose idea was this, it's great" "Who" "YEAH" 100
+  (Idea 2 "" "" "" 0)
+  [ Idea 0 "Idea title" "This is a description of the idea" "Douglas" 0
+  , Idea 1 "Hackday ideas board" "Whose idea was this, it's great" "Who" 100
   ]
 
 -- Helpers
@@ -66,7 +65,6 @@ type Msg = Add
           | Reset
           | UpdateTitle String
           | UpdateDescription String
-          | UpdateStatus String
           | UpdatePerson String
           | Vote Int Int
           | Delete Int
@@ -97,11 +95,6 @@ update msg {new, saved} =
         { new | person = person }
         saved
 
-    UpdateStatus status ->
-      Model
-        { new | status = status }
-        saved
-
     Vote id v ->
       Model
         new
@@ -128,7 +121,7 @@ makeDiv idea =
   [ div [style titleStyle] [text (toString idea.id ++ " " ++ idea.title)]
   , div [] [text (idea.description)]
   , div [] [text (idea.person)]
-  , div [] [text (idea.status)]
+  , viewIdeaStatus idea
   , div [] [text (toString idea.votes)]
   , button [ onClick (Vote idea.id 1) ] [ text "Upvote" ]
   , button [ onClick (Vote idea.id -1) ] [ text "Downvote" ]
@@ -141,9 +134,21 @@ viewNewIdea idea =
     [ input [ placeholder "Title", value idea.title, onInput UpdateTitle ] [ text idea.title ]
     , input [ placeholder "Description", value idea.description, onInput UpdateDescription ] [ text idea.description ]
     , input [ placeholder "Person who proposed the idea", value idea.person, onInput UpdatePerson ] [ text idea.person ]
-    , input [ placeholder "New", value idea.status, onInput UpdateStatus ] [ text idea.status ]
     , button [ onClick Add ] [ text "Submit" ]
     ]
+
+viewIdeaStatus : Idea -> Html msg
+viewIdeaStatus idea =
+  let
+    (color, status) =
+      if idea.votes < 0 then
+        ("red", "Nope")
+      else if idea.votes < 5 then
+        ("orange", "Maybe")
+      else
+        ("green", "Let's do this!")
+  in
+    div [ style [("color", color)] ] [ text status ]
 
 containerStyle : List (String, String)
 containerStyle =
