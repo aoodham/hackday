@@ -53,6 +53,13 @@ onVote id vote new ideas =
       else
         new::ideas
 
+onDelete: Int  -> Idea -> List Idea -> List Idea
+onDelete id new ideas =
+      if new.id == id then
+        ideas
+      else
+        new::ideas
+
 -- UPDATE
 
 type Msg = Add
@@ -62,6 +69,7 @@ type Msg = Add
           | UpdateStatus String
           | UpdatePerson String
           | Vote Int Int
+          | Delete Int
 
 update : Msg -> Model -> Model
 update msg {new, saved} =
@@ -94,10 +102,15 @@ update msg {new, saved} =
         { new | status = status }
         saved
 
-    Vote id v->
+    Vote id v ->
       Model
         new
         (List.foldr (onVote id v) [] saved)
+
+    Delete id ->
+      Model
+        new
+        (List.foldr (onDelete id) [] saved)
 
 -- VIEW
 
@@ -119,6 +132,7 @@ makeDiv idea =
   , div [] [text (toString idea.votes)]
   , button [ onClick (Vote idea.id 1) ] [ text "Upvote" ]
   , button [ onClick (Vote idea.id -1) ] [ text "Downvote" ]
+  , button [ onClick (Delete idea.id) ] [ text "Delete" ]
   ]
 
 viewNewIdea : Idea -> Html Msg
